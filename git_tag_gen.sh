@@ -27,16 +27,21 @@ else
 	echo -e "${CYAN}Getting repos from env REPOSITORY_*...${NC}"
 	repos=($(env | grep REPOSITORY_ | cut -f 2 -d '='))
 fi
-for CURRENT_REPOSITORY in ${repos[@]}; 
+for CURRENT_REPOSITORY_ORIGIN in ${repos[@]}; 
 do
-	ORIGIN=$(echo $CURRENT_REPOSITORY | cut -f 1 -d '/')
-	CURRENT_REPOSITORY=$(echo $CURRENT_REPOSITORY | cut -f 2 -d '/')
+	ORIGIN=$(echo $CURRENT_REPOSITORY_ORIGIN | cut -f 1 -d '/')
+	echo "ORIGIN: $ORIGIN"
+	CURRENT_REPOSITORY=$(echo $CURRENT_REPOSITORY_ORIGIN | cut -f 2 -d '/')
+	echo "CURRENT_REPOSITORY: $CURRENT_REPOSITORY"
+	mkdir -p $ORIGIN && cd $ORIGIN
+	echo "ORIGIN: $PWD"
 	echo -e "${LIGHT_PURPLE}Checking for repository $CURRENT_REPOSITORY...${NC}"
 	if [ ! -d "$CURRENT_REPOSITORY" ]; then
 		echo -e "${ORANGE}Cloning repository...${NC}"
 		git clone https://github.com/$ORIGIN/$CURRENT_REPOSITORY.git || (echo -e "${RED}Failed to clone repository...${NC}" && exit 1)
 	fi
 	cd $CURRENT_REPOSITORY && \
+	echo "REPO_DIR: $PWD"
 	git config credential.helper store && \
 	echo -e "${LIGHT_BLUE}git rebase...${NC}" && \
 	git pull --rebase origin master && \
